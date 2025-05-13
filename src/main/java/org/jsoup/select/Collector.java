@@ -1,6 +1,7 @@
 package org.jsoup.select;
 
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
 import org.jspecify.annotations.Nullable;
 
 import java.util.stream.Collectors;
@@ -22,6 +23,12 @@ public class Collector {
      @return list of matches; empty if none
      */
     public static Elements collect(Evaluator eval, Element root) {
+        if (eval.wantsNodes()) {
+            return streamNodes(eval, root)
+                .filter(node -> node instanceof Element)
+                .map(el -> (Element) el)
+                .collect(Collectors.toCollection(Elements::new));
+        }
         return stream(eval, root).collect(Collectors.toCollection(Elements::new));
     }
 
@@ -36,6 +43,11 @@ public class Collector {
     public static Stream<Element> stream(Evaluator evaluator, Element root) {
         evaluator.reset();
         return root.stream().filter(evaluator.asPredicate(root));
+    }
+
+    static Stream<Node> streamNodes(Evaluator evaluator, Element root) {
+        evaluator.reset();
+        return root.nodeStream().filter(evaluator.asNodePredicate(root));
     }
 
     /**

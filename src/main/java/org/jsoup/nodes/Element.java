@@ -1046,22 +1046,7 @@ public class Element extends Node implements Iterable<Element> {
         return siblings;
     }
 
-    /**
-     * Gets the next sibling element of this element. E.g., if a {@code div} contains two {@code p}s,
-     * the {@code nextElementSibling} of the first {@code p} is the second {@code p}.
-     * <p>
-     * This is similar to {@link #nextSibling()}, but specifically finds only Elements
-     * </p>
-     * @return the next element, or null if there is no next element
-     * @see #previousElementSibling()
-     */
-    public @Nullable Element nextElementSibling() {
-        Node next = this;
-        while ((next = next.nextSibling()) != null) {
-            if (next instanceof Element) return (Element) next;
-        }
-        return null;
-    }
+
 
     /**
      * Get each of the sibling elements that come after this element.
@@ -1070,19 +1055,6 @@ public class Element extends Node implements Iterable<Element> {
      */
     public Elements nextElementSiblings() {
         return nextElementSiblings(true);
-    }
-
-    /**
-     * Gets the previous element sibling of this element.
-     * @return the previous element, or null if there is no previous element
-     * @see #nextElementSibling()
-     */
-    public @Nullable Element previousElementSibling() {
-        Node prev = this;
-        while ((prev = prev.previousSibling()) != null) {
-            if (prev instanceof Element) return (Element) prev;
-        }
-        return null;
     }
 
     /**
@@ -1503,6 +1475,11 @@ public class Element extends Node implements Iterable<Element> {
      */
     public String wholeText() {
         return wholeTextOf(nodeStream());
+    }
+
+    @Override
+    public String nodeValue() {
+        return wholeText();
     }
 
     private static String wholeTextOf(Stream<Node> stream) {
