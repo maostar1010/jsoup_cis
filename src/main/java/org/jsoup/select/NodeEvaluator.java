@@ -10,10 +10,10 @@ import static org.jsoup.internal.Normalizer.lowerCase;
 import static org.jsoup.internal.StringUtil.normaliseWhitespace;
 
 class NodeEvaluator extends Evaluator {
-    final java.lang.Class<? extends LeafNode> type;
+    final java.lang.Class<? extends Node> type;
     final String selector;
 
-    NodeEvaluator(java.lang.Class<? extends LeafNode> type, String selector) {
+    NodeEvaluator(java.lang.Class<? extends Node> type, String selector) {
         super();
         this.type = type;
         this.selector = "::" + selector;
@@ -26,11 +26,15 @@ class NodeEvaluator extends Evaluator {
 
     @Override
     public boolean matches(Element root, Element element) {
-        return false;
+        return evaluateMatch(root, element);
     }
 
     @Override boolean matches(Element root, LeafNode leaf) {
-        return type.isInstance(leaf);
+        return evaluateMatch(root, leaf);
+    }
+
+    boolean evaluateMatch(Element root, Node node) {
+        return type.isInstance(node);
     }
 
     @Override boolean wantsNodes() {
@@ -51,12 +55,16 @@ class NodeEvaluator extends Evaluator {
 
         @Override
         public boolean matches(Element root, Element element) {
-            return false;
+            return evaluateMatch(root, element);
         }
 
         @Override
         boolean matches(Element root, LeafNode leafNode) {
-            return leafNode.nodeValue().toLowerCase(Locale.ROOT).contains(searchText);
+            return evaluateMatch(root, leafNode);
+        }
+
+        boolean evaluateMatch(Element root, Node node) {
+            return node.nodeValue().toLowerCase(Locale.ROOT).contains(searchText);
         }
 
         @Override

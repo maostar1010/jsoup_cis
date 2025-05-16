@@ -5,6 +5,7 @@ import org.jsoup.helper.Validate;
 import org.jsoup.nodes.Comment;
 import org.jsoup.nodes.DataNode;
 import org.jsoup.nodes.LeafNode;
+import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.parser.TokenQueue;
 import org.jspecify.annotations.Nullable;
@@ -264,6 +265,9 @@ public class QueryParser implements AutoCloseable {
         Evaluator left;
         switch (pseudo) {
             case "node":
+                left = new NodeEvaluator(Node.class, pseudo);
+                break;
+            case "leafnode":
                 left = new NodeEvaluator(LeafNode.class, pseudo);
                 break;
             case "text":

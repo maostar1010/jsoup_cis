@@ -13,6 +13,7 @@ import org.jsoup.select.Elements;
 import org.jsoup.select.Evaluator;
 import org.jsoup.select.NodeFilter;
 import org.jsoup.select.NodeVisitor;
+import org.jsoup.select.Nodes;
 import org.jsoup.select.Selector;
 import org.jspecify.annotations.Nullable;
 
@@ -587,6 +588,65 @@ public class Element extends Node implements Iterable<Element> {
                 "No elements matched the query '%s' in the document."
             , cssQuery, this.tagName()
         );
+    }
+
+    /**
+     Find nodes that match the supplied {@link Evaluator}, with this element as the starting context. Matched
+     nodes may include this element, or any of its descendents.
+
+     @param evaluator an evaluator
+     @return a list of nodes that match the query (empty if none match)
+     @since 1.21.1
+     */
+    public Nodes<Node> selectNodes(Evaluator evaluator) {
+        return selectNodes(evaluator, Node.class);
+    }
+
+    /**
+     Find nodes that match the supplied {@link Selector} CSS query, with this element as the starting context. Matched
+     nodes may include this element, or any of its descendents.
+     <p>To select leaf nodes, the query should specify the node type, e.g. {@code ::text},
+     {@code ::comment}, {@code ::data}, {@code ::leafnode}, {@code ::node}.</p>
+
+     @param cssQuery a {@link Selector} CSS query
+     @return a list of nodes that match the query (empty if none match)
+     @since 1.21.1
+     */
+    public Nodes<Node> selectNodes(String cssQuery) {
+        return selectNodes(cssQuery, Node.class);
+    }
+
+    /**
+     Find nodes that match the supplied Evaluator, with this element as the starting context. Matched
+     nodes may include this element, or any of its descendents.
+
+     @param evaluator an evaluator
+     @param type the type of node to collect (e.g. {@link Element}, {@link LeafNode}, {@link TextNode} etc)
+     @param <T> the type of node to collect
+     @return a list of nodes that match the query (empty if none match)
+     @since 1.21.1
+     */
+    public <T extends Node> Nodes<T> selectNodes(Evaluator evaluator, Class<T> type) {
+        Validate.notNull(evaluator);
+        return Collector.collectNodes(evaluator, this, type);
+    }
+
+    /**
+     Find nodes that match the supplied {@link Selector} CSS query, with this element as the starting context. Matched
+     nodes may include this element, or any of its descendents.
+     <p>To select specific node types, use {@code ::text}, {@code ::comment}, {@code ::leaf}, etc. For example, to
+     select all text nodes under {@code p} elements: </p>
+     <pre>    Nodes&lt;TextNode&gt; textNodes = doc.selectNodes("p ::text", TextNode.class);</pre>
+
+     @param cssQuery a {@link Selector} CSS query
+     @param type the type of node to collect (e.g. {@link Element}, {@link LeafNode}, {@link TextNode} etc)
+     @param <T> the type of node to collect
+     @return a list of nodes that match the query (empty if none match)
+     @since 1.21.1
+     */
+    public <T extends Node> Nodes<T> selectNodes(String cssQuery, Class<T> type) {
+        Validate.notEmpty(cssQuery);
+        return selectNodes(evaluatorOf(cssQuery), type);
     }
 
     /**

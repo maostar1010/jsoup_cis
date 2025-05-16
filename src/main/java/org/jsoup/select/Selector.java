@@ -2,6 +2,7 @@ package org.jsoup.select;
 
 import org.jsoup.helper.Validate;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
 import org.jsoup.parser.TokenQueue;
 import org.jspecify.annotations.Nullable;
 
@@ -21,6 +22,9 @@ import java.util.stream.Stream;
  The universal selector {@code *} is implicit when no element selector is supplied (i.e. {@code .header} and
  {@code *.header} are equivalent).
  </p>
+
+ <p>You can easily test different selectors using the <a href="https://try.jsoup.org/?utm_source=jsoup&amp;utm_medium=javadoc">Try jsoup online playground</a>.
+
  <style>table.syntax tr td {vertical-align: top; padding-right: 2em; padding-top:0.5em; padding-bottom:0.5em; }
  table.syntax tr:hover{background-color: #eee;} table.syntax {border-spacing: 0px 0px;}</style>
 
@@ -86,9 +90,11 @@ import java.util.stream.Stream;
 
  <tr><td colspan="3"><h3>Node pseudo selectors</h3></td></tr>
  <tr><td colspan="3">These selectors enable matching specific leaf nodes, including Comments, TextNodes. When used with {@link Element#select(String)}, these can be used with structural selectors such as <code>:has()</code> to refine which Elements are matched. To retrieve matching Nodes directly, use {@Element#selectNodes(String)}.</td></tr>
- <tr><td>::node</td><td>Matches any leaf-node (this is, a Node which is not an Element)</td><td></td></tr>
+ <tr><td>::node</td><td>Matches any node</td><td></td></tr>
+ <tr><td>::leafnode</td><td>Matches any leaf-node (this is, a Node which is not an Element)</td><td></td></tr>
  <tr><td>::comment</td><td>Matches a Comment node</td><td></td></tr>
  <tr><td>::text</td><td>Matches a TextNode</td><td></td></tr>
+ <tr><td>::data</td><td>Matches a DataNode</td><td></td></tr>
  <tr><td>::node:contains(text)</td><td>Matches a node that has a (normalized, case-insensitive) value containing <i>text</i>.</td><td>::comment:contains(foo bar)</td></tr>
  <tr><td>::node:matches(regex)</td><td>Matches a node that has a value matching the regex.</td><td>::comment:matches(\\d+)</td></tr>
  </table>
@@ -97,7 +103,10 @@ import java.util.stream.Stream;
  <p><b>Escaping special characters:</b> to match a tag, ID, or other selector that does not follow the regular CSS syntax, the query must be escaped with the <code>\</code> character. For example, to match by ID {@code <p id="i.d">}, use {@code document.select("#i\\.d")}.</p>
 
  @see Element#select(String css)
+ @see Element#selectFirst(String css)
  @see Element#select(Evaluator eval)
+ @see Element#selectNodes(String css)
+ @see Element#selectNodes(String css, Class nodeType)
  @see Elements#select(String css)
  @see Element#selectXpath(String xpath) */
 public class Selector {
