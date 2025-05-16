@@ -26,14 +26,14 @@ class NodeEvaluator extends Evaluator {
 
     @Override
     public boolean matches(Element root, Element element) {
-        return evaluateMatch(root, element);
+        return evaluateMatch(element);
     }
 
     @Override boolean matches(Element root, LeafNode leaf) {
-        return evaluateMatch(root, leaf);
+        return evaluateMatch(leaf);
     }
 
-    boolean evaluateMatch(Element root, Node node) {
+    boolean evaluateMatch(Node node) {
         return type.isInstance(node);
     }
 
@@ -55,15 +55,15 @@ class NodeEvaluator extends Evaluator {
 
         @Override
         public boolean matches(Element root, Element element) {
-            return evaluateMatch(root, element);
+            return evaluateMatch(element);
         }
 
         @Override
         boolean matches(Element root, LeafNode leafNode) {
-            return evaluateMatch(root, leafNode);
+            return evaluateMatch(leafNode);
         }
 
-        boolean evaluateMatch(Element root, Node node) {
+        boolean evaluateMatch(Node node) {
             return node.nodeValue().toLowerCase(Locale.ROOT).contains(searchText);
         }
 
