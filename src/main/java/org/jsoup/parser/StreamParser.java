@@ -221,7 +221,7 @@ public class StreamParser implements Closeable {
      @throws IOException if an I/O error occurs
      */
     public Element expectFirst(String query) throws IOException {
-        return (Element) Validate.ensureNotNull(
+        return Validate.expectNotNull(
             selectFirst(query),
             "No elements matched the query '%s' in the document."
             , query
@@ -269,7 +269,7 @@ public class StreamParser implements Closeable {
      @throws IOException if an I/O error occurs
      */
     public Element expectNext(String query) throws IOException {
-        return (Element) Validate.ensureNotNull(
+        return Validate.expectNotNull(
             selectNext(query),
             "No elements matched the query '%s' in the document."
             , query

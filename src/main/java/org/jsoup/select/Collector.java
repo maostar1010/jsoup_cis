@@ -76,6 +76,20 @@ public class Collector {
     }
 
     /**
+     Finds the first Node that matches the Evaluator that descends from the root, and stops the query once that first
+     match is found.
+
+     @param eval Evaluator to test elements against
+     @param root root of tree to descend
+     @param type the type of node to collect (e.g. {@link Element}, {@link LeafNode}, {@link TextNode} etc)
+     @return the first match; {@code null} if none
+     @since 1.21.1
+     */
+    public static <T extends Node> @Nullable T findFirstNode(Evaluator eval, Element root, Class<T> type) {
+        return streamNodes(eval, root, type).findFirst().orElse(null);
+    }
+
+    /**
      Build a list of nodes that match the supplied criteria, by visiting the root and every descendant of root, and
      testing it against the Evaluator.
 

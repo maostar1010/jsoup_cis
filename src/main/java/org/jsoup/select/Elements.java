@@ -461,7 +461,7 @@ public class Elements extends Nodes<Element> {
      @since 1.19.1
      */
     public Element expectFirst(String cssQuery) {
-        return (Element) Validate.ensureNotNull(
+        return Validate.expectNotNull(
             Selector.selectFirst(cssQuery, this),
             "No elements matched the query '%s' in the elements.", cssQuery
         );

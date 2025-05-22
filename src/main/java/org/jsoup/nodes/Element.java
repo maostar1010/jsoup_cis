@@ -581,10 +581,10 @@ public class Element extends Node implements Iterable<Element> {
      @since 1.15.2
      */
     public Element expectFirst(String cssQuery) {
-        return (Element) Validate.ensureNotNull(
+        return Validate.expectNotNull(
             Selector.selectFirst(cssQuery, this),
             parent() != null ?
-                "No elements matched the query '%s' on element '%s'.":
+                "No elements matched the query '%s' on element '%s'." :
                 "No elements matched the query '%s' in the document."
             , cssQuery, this.tagName()
         );
@@ -647,6 +647,54 @@ public class Element extends Node implements Iterable<Element> {
     public <T extends Node> Nodes<T> selectNodes(String cssQuery, Class<T> type) {
         Validate.notEmpty(cssQuery);
         return selectNodes(evaluatorOf(cssQuery), type);
+    }
+
+    /**
+     Find the first Node that matches the {@link Selector} CSS query, with this element as the starting context.
+     <p>This is effectively the same as calling {@code element.selectNodes(query).first()}, but is more efficient as
+     query
+     execution stops on the first hit.</p>
+     <p>Also known as {@code querySelector()} in the Web DOM.</p>
+
+     @param cssQuery cssQuery a {@link Selector} CSS-like query
+     @return the first matching node, or <b>{@code null}</b> if there is no match.
+     @since 1.21.1
+     @see #expectFirst(String)
+     */
+    public @Nullable <T extends Node> T selectFirstNode(String cssQuery, Class<T> type) {
+        return selectFirstNode(evaluatorOf(cssQuery), type);
+    }
+
+    /**
+     Finds the first Node that matches the supplied Evaluator, with this element as the starting context, or
+     {@code null} if none match.
+
+     @param evaluator an element evaluator
+     @return the first matching node (walking down the tree, starting from this element), or {@code null} if none
+     match.
+     @since 1.21.1
+     */
+    public @Nullable <T extends Node> T selectFirstNode(Evaluator evaluator, Class<T> type) {
+        return Collector.findFirstNode(evaluator, this, type);
+    }
+
+    /**
+     Just like {@link #selectFirstNode(String, Class)}, but if there is no match, throws an
+     {@link IllegalArgumentException}. This is useful if you want to simply abort processing on a failed match.
+
+     @param cssQuery a {@link Selector} CSS-like query
+     @return the first matching node
+     @throws IllegalArgumentException if no match is found
+     @since 1.21.1
+     */
+    public <T extends Node> T expectFirstNode(String cssQuery, Class<T> type) {
+        return Validate.expectNotNull(
+            selectFirstNode(cssQuery, type),
+            parent() != null ?
+                "No nodes matched the query '%s' on element '%s'.":
+                "No nodes matched the query '%s' in the document."
+            , cssQuery, this.tagName()
+        );
     }
 
     /**
