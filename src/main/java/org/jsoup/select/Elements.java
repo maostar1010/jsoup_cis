@@ -272,29 +272,6 @@ public class Elements extends Nodes<Element> {
             .map(Element::html)
             .collect(StringUtil.joining("\n"));
     }
-    
-    /**
-     * Get the combined outer HTML of all matched elements.
-     * @return string of all element's outer HTML.
-     * @see #text()
-     * @see #html()
-     */
-    public String outerHtml() {
-        return stream()
-            .map(Element::outerHtml)
-            .collect(StringUtil.joining("\n"));
-    }
-
-    /**
-     * Get the combined outer HTML of all matched elements. Alias of {@link #outerHtml()}.
-     * @return string of all element's outer HTML.
-     * @see #text()
-     * @see #html()
-     */
-    @Override
-    public String toString() {
-        return outerHtml();
-    }
 
     /**
      * Update (rename) the tag name of each matched element. For example, to change each {@code <i>} to a {@code <em>}, do
@@ -349,30 +326,30 @@ public class Elements extends Nodes<Element> {
         }
         return this;
     }
-    
+
     /**
-     * Insert the supplied HTML before each matched element's outer HTML.
-     * @param html HTML to insert before each element
-     * @return this, for chaining
-     * @see Element#before(String)
+     Insert the supplied HTML before each matched element's outer HTML.
+
+     @param html HTML to insert before each element
+     @return this, for chaining
+     @see Element#before(String)
      */
+    @Override
     public Elements before(String html) {
-        for (Element element : this) {
-            element.before(html);
-        }
+        super.before(html);
         return this;
     }
-    
+
     /**
-     * Insert the supplied HTML after each matched element's outer HTML.
-     * @param html HTML to insert after each element
-     * @return this, for chaining
-     * @see Element#after(String)
+     Insert the supplied HTML after each matched element's outer HTML.
+
+     @param html HTML to insert after each element
+     @return this, for chaining
+     @see Element#after(String)
      */
+    @Override
     public Elements after(String html) {
-        for (Element element : this) {
-            element.after(html);
-        }
+        super.after(html);
         return this;
     }
 
@@ -381,15 +358,13 @@ public class Elements extends Nodes<Element> {
      {@code <p><b>This</b> is <b>Jsoup</b></p>},
      <code>doc.select("b").wrap("&lt;i&gt;&lt;/i&gt;");</code>
      becomes {@code <p><i><b>This</b></i> is <i><b>jsoup</b></i></p>}
+
      @param html HTML to wrap around each element, e.g. {@code <div class="head"></div>}. Can be arbitrarily deep.
      @return this (for chaining)
      @see Element#wrap
      */
     public Elements wrap(String html) {
-        Validate.notEmpty(html);
-        for (Element element : this) {
-            element.wrap(html);
-        }
+        super.wrap(html);
         return this;
     }
 
@@ -446,10 +421,9 @@ public class Elements extends Nodes<Element> {
      * @see #empty()
      * @see #clear()
      */
+    @Override
     public Elements remove() {
-        for (Element element : this) {
-            element.remove();
-        }
+        super.remove();
         return this;
     }
     
@@ -633,7 +607,7 @@ public class Elements extends Nodes<Element> {
      @return The first matched element, or <code>null</code> if contents is empty.
      */
     public @Nullable Element first() {
-        return isEmpty() ? null : get(0);
+        return super.first();
     }
 
     /**
@@ -641,7 +615,7 @@ public class Elements extends Nodes<Element> {
      @return The last matched element, or <code>null</code> if contents is empty.
      */
     public @Nullable Element last() {
-        return isEmpty() ? null : get(size() - 1);
+        return super.last();
     }
 
     /**

@@ -1,8 +1,10 @@
 package org.jsoup.select;
 
 import org.jsoup.helper.Validate;
+import org.jsoup.internal.StringUtil;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,14 +16,17 @@ import java.util.function.UnaryOperator;
 
 /**
  A list of {@link Node} objects, with methods that act on every node in the list.
- <p>Methods that {@link #set(int, T) set}, {@link #remove(int) remove}, or {@link #replaceAll(UnaryOperator)
-replace} Elements in the list will also act on the underlying {@link org.jsoup.nodes.Document DOM}.</p>
+ <p>Methods that {@link #set(int, T) set}, {@link #remove(int) remove}, or
+ {@link #replaceAll(UnaryOperator)  replace} nodes in the list will also act on the underlying
+ {@link org.jsoup.nodes.Document DOM}.</p>
 
- @since 1.21.1
- */
+ <p>If there are other bulk methods (perhaps from Elements) that would be useful here, please <a
+ href="https://jsoup.org/discussion">provide feedback</a>.</p>
+
+ @see Element#selectNodes(String)
+ @see Element#selectNodes(String, Class)
+ @since 1.21.1 */
 public class Nodes<T extends Node> extends ArrayList<T> {
-    // todo push applicable methods down from Elements to Nodes
-
     public Nodes() {
     }
 
@@ -88,6 +93,93 @@ public class Nodes<T extends Node> extends ArrayList<T> {
             node.remove();
         }
         return this;
+    }
+
+    /**
+     Get the combined outer HTML of all matched nodes.
+
+     @return string of all node's outer HTML.
+     @see Elements#text()
+     @see Elements#html()
+     */
+    public String outerHtml() {
+        return stream()
+            .map(Node::outerHtml)
+            .collect(StringUtil.joining("\n"));
+    }
+
+    /**
+     Get the combined outer HTML of all matched nodes. Alias of {@link #outerHtml()}.
+
+     @return string of all the node's outer HTML.
+     @see Elements#text()
+     @see #outerHtml()
+     */
+    @Override
+    public String toString() {
+        return outerHtml();
+    }
+
+    /**
+     Insert the supplied HTML before each matched node's outer HTML.
+
+     @param html HTML to insert before each node
+     @return this, for chaining
+     @see Element#before(String)
+     */
+    public Nodes<T> before(String html) {
+        for (T node : this) {
+            node.before(html);
+        }
+        return this;
+    }
+
+    /**
+     Insert the supplied HTML after each matched nodes's outer HTML.
+
+     @param html HTML to insert after each node
+     @return this, for chaining
+     @see Element#after(String)
+     */
+    public Nodes<T> after(String html) {
+        for (T node : this) {
+            node.after(html);
+        }
+        return this;
+    }
+
+    /**
+     Wrap the supplied HTML around each matched node. For example, with HTML
+     {@code <p><b>This</b> is <b>Jsoup</b></p>},
+     <code>doc.select("b").wrap("&lt;i&gt;&lt;/i&gt;");</code>
+     becomes {@code <p><i><b>This</b></i> is <i><b>jsoup</b></i></p>}
+     @param html HTML to wrap around each node, e.g. {@code <div class="head"></div>}. Can be arbitrarily deep.
+     @return this (for chaining)
+     @see Element#wrap
+     */
+    public Nodes<T> wrap(String html) {
+        Validate.notEmpty(html);
+        for (T node : this) {
+            node.wrap(html);
+        }
+        return this;
+    }
+
+    // list-like methods
+    /**
+     Get the first matched element.
+     @return The first matched element, or <code>null</code> if contents is empty.
+     */
+    public @Nullable T first() {
+        return isEmpty() ? null : get(0);
+    }
+
+    /**
+     Get the last matched element.
+     @return The last matched element, or <code>null</code> if contents is empty.
+     */
+    public @Nullable T last() {
+        return isEmpty() ? null : get(size() - 1);
     }
 
     // ArrayList<T> methods that update the DOM:
