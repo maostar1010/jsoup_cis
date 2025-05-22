@@ -26,7 +26,7 @@ import java.util.stream.Stream;
 public abstract class Node implements Cloneable {
     static final List<Node> EmptyNodes = Collections.emptyList();
     static final String EmptyString = "";
-    @Nullable Node parentNode; // Nodes don't always have parents
+    @Nullable Element parentNode; // Nodes don't always have parents
     int siblingIndex;
 
     /**
@@ -322,13 +322,23 @@ public abstract class Node implements Cloneable {
      */
     public abstract Node empty();
 
-
     /**
-     Gets this node's parent node.
+     Gets this node's parent node. This is always an Element.
      @return parent node; or null if no parent.
      @see #hasParent()
+     @see #parentElement();
      */
     public @Nullable Node parent() {
+        return parentNode;
+    }
+
+    /**
+     Gets this node's parent Element.
+     @return parent element; or null if this node has no parent.
+     @see #hasParent()
+     @since 1.21.1
+     */
+    public @Nullable Element parentElement() {
         return parentNode;
     }
 
@@ -525,7 +535,8 @@ public abstract class Node implements Cloneable {
         Validate.notNull(parentNode);
         if (this.parentNode != null)
             this.parentNode.removeChild(this);
-        this.parentNode = parentNode;
+        assert parentNode instanceof Element;
+        this.parentNode = (Element) parentNode;
     }
 
     protected void replaceChild(Node out, Node in) {
@@ -538,7 +549,8 @@ public abstract class Node implements Cloneable {
 
         final int index = out.siblingIndex;
         ensureChildNodes().set(index, in);
-        in.parentNode = this;
+        assert this instanceof Element;
+        in.parentNode = (Element) this;
         in.setSiblingIndex(index);
         out.parentNode = null;
     }
@@ -587,8 +599,9 @@ public abstract class Node implements Cloneable {
                 firstParent.empty();
                 nodes.addAll(index, Arrays.asList(children));
                 i = children.length;
+                assert this instanceof Element;
                 while (i-- > 0) {
-                    children[i].parentNode = this;
+                    children[i].parentNode = (Element) this;
                 }
                 if (!(wasEmpty && children[0].siblingIndex == 0)) // skip reindexing if we just moved
                     reindexChildren(index);
@@ -982,6 +995,7 @@ public abstract class Node implements Cloneable {
      * Not a deep copy of children.
      */
     protected Node doClone(@Nullable Node parent) {
+        assert parent == null || parent instanceof Element;
         Node clone;
 
         try {
@@ -990,7 +1004,7 @@ public abstract class Node implements Cloneable {
             throw new RuntimeException(e);
         }
 
-        clone.parentNode = parent; // can be null, to create an orphan split
+        clone.parentNode = (Element) parent; // can be null, to create an orphan split
         clone.siblingIndex = parent == null ? 0 : siblingIndex;
         // if not keeping the parent, shallowClone the ownerDocument to preserve its settings
         if (parent == null && !(this instanceof Document)) {
