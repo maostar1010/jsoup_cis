@@ -7,6 +7,7 @@ import org.jsoup.nodes.LeafNode;
 import org.jsoup.nodes.Node;
 
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 import static org.jsoup.internal.Normalizer.lowerCase;
 import static org.jsoup.internal.StringUtil.normaliseWhitespace;
@@ -76,7 +77,7 @@ class NodeEvaluator extends Evaluator {
 
         @Override
         protected int cost() {
-            return 10;
+            return 6;
         }
 
         @Override
@@ -111,6 +112,43 @@ class NodeEvaluator extends Evaluator {
         @Override
         public String toString() {
             return ":blank";
+        }
+
+        @Override
+        boolean wantsNodes() {
+            return true;
+        }
+    }
+
+    static class MatchesValue extends Evaluator {
+        private final Pattern pattern;
+
+        protected MatchesValue(Pattern pattern) {
+            this.pattern = pattern;
+        }
+
+        @Override
+        public boolean matches(Element root, Element element) {
+            return evaluateMatch(element);
+        }
+
+        @Override
+        boolean matches(Element root, LeafNode leafNode) {
+            return evaluateMatch(leafNode);
+        }
+
+        boolean evaluateMatch(Node node) {
+            return pattern.matcher(node.nodeValue()).find();
+        }
+
+        @Override
+        protected int cost() {
+            return 8;
+        }
+
+        @Override
+        public String toString() {
+            return String.format(":matches(%s)", pattern);
         }
 
         @Override

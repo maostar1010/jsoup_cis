@@ -1673,4 +1673,19 @@ public class SelectorTest {
         assertEquals("Two", text.get(1).getWholeText());
     }
 
+    @Test void nodeMatches() {
+        Document doc = Jsoup.parse("<p>1234</p> <p>123</p> <p>12</p> <p>1</p> <!--4321--> <!--432--> <!-- 43 -->");
+
+        String regex = "::leafnode:matches(\\d{3,4})";
+        Evaluator eval = Selector.evaluatorOf(regex);
+        assertEquals("(And (NodeEvaluator '::leafnode')(MatchesValue ':matches(\\d{3,4})'))", sexpr(eval));
+
+        Nodes<Node> nodes = doc.selectNodes(eval);
+        assertEquals(4, nodes.size());
+        assertEquals("1234", nodes.get(0).nodeValue());
+        assertEquals("123", nodes.get(1).nodeValue());
+        assertEquals("4321", nodes.get(2).nodeValue());
+        assertEquals("432", nodes.get(3).nodeValue());
+    }
+
 }

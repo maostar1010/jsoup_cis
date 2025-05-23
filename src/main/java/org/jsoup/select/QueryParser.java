@@ -468,10 +468,14 @@ public class QueryParser implements AutoCloseable {
         String query = own ? ":matchesOwn" : ":matches";
         String regex = consumeParens(); // don't unescape, as regex bits will be escaped
         Validate.notEmpty(regex, query + "(regex) query must not be empty");
+        Pattern pattern = Pattern.compile(regex);
+
+        if (inNodeContext)
+            return new NodeEvaluator.MatchesValue(pattern);
 
         return own
-            ? new Evaluator.MatchesOwn(Pattern.compile(regex))
-            : new Evaluator.Matches(Pattern.compile(regex));
+            ? new Evaluator.MatchesOwn(pattern)
+            : new Evaluator.Matches(pattern);
     }
 
     // :matches(regex), matchesOwn(regex)
