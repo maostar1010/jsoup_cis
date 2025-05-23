@@ -1,12 +1,10 @@
 package org.jsoup.select;
 
 import org.jsoup.internal.StringUtil;
-import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.LeafNode;
 import org.jsoup.nodes.Node;
 
-import java.util.Locale;
 import java.util.regex.Pattern;
 
 import static org.jsoup.internal.Normalizer.lowerCase;
@@ -70,7 +68,7 @@ abstract class NodeEvaluator extends Evaluator {
         }
 
         boolean evaluateMatch(Node node) {
-            return node.nodeValue().toLowerCase(Locale.ROOT).contains(searchText);
+            return lowerCase(node.nodeValue()).contains(searchText);
         }
 
         @Override
