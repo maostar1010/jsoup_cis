@@ -232,7 +232,7 @@ public class QueryParserTest {
     @Test void hasNodeSelector() {
         String q = "p:has(::comment:contains(some text))";
         Evaluator e = QueryParser.parse(q);
-        assertEquals("(And (Tag 'p')(Has (And (NodeEvaluator '::comment')(ContainsValue ':contains(some text)'))))", sexpr(e));
+        assertEquals("(And (Tag 'p')(Has (And (InstanceType '::comment')(ContainsValue ':contains(some text)'))))", sexpr(e));
         assertEquals(q, e.toString());
     }
 }

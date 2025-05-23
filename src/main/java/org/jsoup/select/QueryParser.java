@@ -267,19 +267,19 @@ public class QueryParser implements AutoCloseable {
         Evaluator left;
         switch (pseudo) {
             case "node":
-                left = new NodeEvaluator(Node.class, pseudo);
+                left = new NodeEvaluator.InstanceType(Node.class, pseudo);
                 break;
             case "leafnode":
-                left = new NodeEvaluator(LeafNode.class, pseudo);
+                left = new NodeEvaluator.InstanceType(LeafNode.class, pseudo);
                 break;
             case "text":
-                left = new NodeEvaluator(TextNode.class, pseudo);
+                left = new NodeEvaluator.InstanceType(TextNode.class, pseudo);
                 break;
             case "comment":
-                left = new NodeEvaluator(Comment.class, pseudo);
+                left = new NodeEvaluator.InstanceType(Comment.class, pseudo);
                 break;
             case "data":
-                left = new NodeEvaluator(DataNode.class, pseudo);
+                left = new NodeEvaluator.InstanceType(DataNode.class, pseudo);
                 break;
             default:
                 throw new Selector.SelectorParseException("Could not parse query '%s': unexpected token at '%s'", query,

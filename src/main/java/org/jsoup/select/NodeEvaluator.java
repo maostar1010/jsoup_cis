@@ -12,44 +12,47 @@ import java.util.regex.Pattern;
 import static org.jsoup.internal.Normalizer.lowerCase;
 import static org.jsoup.internal.StringUtil.normaliseWhitespace;
 
-class NodeEvaluator extends Evaluator {
-    final java.lang.Class<? extends Node> type;
-    final String selector;
-
-    NodeEvaluator(java.lang.Class<? extends Node> type, String selector) {
-        super();
-        this.type = type;
-        this.selector = "::" + selector;
-    }
-
-    @Override
-    protected int cost() {
-        return 1;
-    }
-
-    @Override
-    public boolean matches(Element root, Element element) {
-        return evaluateMatch(element);
-    }
-
-    @Override boolean matches(Element root, LeafNode leaf) {
-        return evaluateMatch(leaf);
-    }
-
-    boolean evaluateMatch(Node node) {
-        return type.isInstance(node);
-    }
-
+abstract class NodeEvaluator extends Evaluator {
+    
     @Override boolean wantsNodes() {
         return true;
     }
 
-    @Override
-    public String toString() {
-        return selector;
+    static class InstanceType extends NodeEvaluator {
+        final java.lang.Class<? extends Node> type;
+        final String selector;
+
+        InstanceType(java.lang.Class<? extends Node> type, String selector) {
+            super();
+            this.type = type;
+            this.selector = "::" + selector;
+        }
+
+        @Override
+        protected int cost() {
+            return 1;
+        }
+
+        @Override
+        public boolean matches(Element root, Element element) {
+            return evaluateMatch(element);
+        }
+
+        @Override boolean matches(Element root, LeafNode leaf) {
+            return evaluateMatch(leaf);
+        }
+
+        boolean evaluateMatch(Node node) {
+            return type.isInstance(node);
+        }
+
+        @Override
+        public String toString() {
+            return selector;
+        }
     }
 
-    static class ContainsValue extends Evaluator {
+    static class ContainsValue extends NodeEvaluator {
         private final String searchText;
 
         public ContainsValue(String searchText) {
@@ -71,11 +74,6 @@ class NodeEvaluator extends Evaluator {
         }
 
         @Override
-        boolean wantsNodes() {
-            return true;
-        }
-
-        @Override
         protected int cost() {
             return 6;
         }
@@ -89,7 +87,7 @@ class NodeEvaluator extends Evaluator {
     /**
      Matches nodes with no value or only whitespace.
      */
-    static class BlankValue extends Evaluator {
+    static class BlankValue extends NodeEvaluator {
         @Override
         public boolean matches(Element root, Element element) {
             return evaluateMatch(element);
@@ -113,14 +111,9 @@ class NodeEvaluator extends Evaluator {
         public String toString() {
             return ":blank";
         }
-
-        @Override
-        boolean wantsNodes() {
-            return true;
-        }
     }
 
-    static class MatchesValue extends Evaluator {
+    static class MatchesValue extends NodeEvaluator {
         private final Pattern pattern;
 
         protected MatchesValue(Pattern pattern) {
@@ -149,11 +142,6 @@ class NodeEvaluator extends Evaluator {
         @Override
         public String toString() {
             return String.format(":matches(%s)", pattern);
-        }
-
-        @Override
-        boolean wantsNodes() {
-            return true;
         }
     }
 }

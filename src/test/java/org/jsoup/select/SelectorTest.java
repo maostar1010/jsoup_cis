@@ -1518,17 +1518,17 @@ public class SelectorTest {
         Document doc = Jsoup.parse("<div id=1><div id=2><!-- comment2 --><div id=3><!-- comment3 --></div></div></div><div id=4><div id=5><div id=6>Not</div></div></div>");
 
         String q = "div > div:has(::comment)";
-        assertEquals("(ImmediateParentRun (Tag 'div')(And (Tag 'div')(Has (NodeEvaluator '::comment'))))", sexpr(q));
+        assertEquals("(ImmediateParentRun (Tag 'div')(And (Tag 'div')(Has (InstanceType '::comment'))))", sexpr(q));
         Elements els1 = doc.select(q);
         assertSelectedIds(els1, "2", "3");
 
         String q2 = "div div:has(>::comment:contains(comment3))";
-        assertEquals("(And (Ancestor (Tag 'div'))(And (Tag 'div')(Has (ImmediateParentRun (Root '>')(And (NodeEvaluator '::comment')(ContainsValue ':contains(comment3)'))))))", sexpr(q2));
+        assertEquals("(And (Ancestor (Tag 'div'))(And (Tag 'div')(Has (ImmediateParentRun (Root '>')(And (InstanceType '::comment')(ContainsValue ':contains(comment3)'))))))", sexpr(q2));
         Elements els2 = doc.select(q2);
         assertSelectedIds(els2, "3");
 
         String q3 = "div:has(>::comment) div";
-        assertEquals("(And (Tag 'div')(Ancestor (And (Tag 'div')(Has (ImmediateParentRun (Root '>')(NodeEvaluator '::comment'))))))", sexpr(q3));
+        assertEquals("(And (Tag 'div')(Ancestor (And (Tag 'div')(Has (ImmediateParentRun (Root '>')(InstanceType '::comment'))))))", sexpr(q3));
         Elements els3 = doc.select(q3);
         assertSelectedIds(els3, "3");
     }
@@ -1536,7 +1536,7 @@ public class SelectorTest {
     @Test void nodeWithElementAncestor() {
         Document doc = Jsoup.parse("<div id=1><div id=2><p> <!-- comment --></p></div></div>");
         String q = "div:has(p ::comment)";
-        assertEquals("(And (Tag 'div')(Has (And (NodeEvaluator '::comment')(Ancestor (Tag 'p')))))", sexpr(q));
+        assertEquals("(And (Tag 'div')(Has (And (InstanceType '::comment')(Ancestor (Tag 'p')))))", sexpr(q));
         Elements els = doc.select(q);
         assertSelectedIds(els, "1", "2");
     }
@@ -1545,12 +1545,12 @@ public class SelectorTest {
         Document doc = Jsoup.parse("<div><!-- comment --><p id=1><p id=2></div><div><p id=3><p id=4>");
 
         String q = "::comment ~ p";
-        assertEquals("(And (Tag 'p')(PreviousSibling (NodeEvaluator '::comment')))", sexpr(q));
+        assertEquals("(And (Tag 'p')(PreviousSibling (InstanceType '::comment')))", sexpr(q));
         Elements els1 = doc.select(q);
         assertSelectedIds(els1, "1", "2");
 
         String q2 = "::comment + p";
-        assertEquals("(And (Tag 'p')(ImmediatePreviousSibling (NodeEvaluator '::comment')))", sexpr(q2));
+        assertEquals("(And (Tag 'p')(ImmediatePreviousSibling (InstanceType '::comment')))", sexpr(q2));
         Elements els2 = doc.select(q2);
         assertSelectedIds(els2, "1");
     }
@@ -1558,7 +1558,7 @@ public class SelectorTest {
     @Test void datanode() {
         Document doc = Jsoup.parse("<div id=1> <!-- foo --> </div> <div id=2> <script>foo</script> </div> <div><script>bar></script>");
         String q = "div:has(::data:contains(foo))";
-        assertEquals("(And (Tag 'div')(Has (And (NodeEvaluator '::data')(ContainsValue ':contains(foo)'))))", sexpr(q));
+        assertEquals("(And (Tag 'div')(Has (And (InstanceType '::data')(ContainsValue ':contains(foo)'))))", sexpr(q));
         Elements els = doc.select(q);
         assertSelectedIds(els, "2");
     }
@@ -1566,7 +1566,7 @@ public class SelectorTest {
     @Test void leafNode() {
         Document doc = Jsoup.parse("<div id=1></div><div id=2> </div>");
         String q = "div:has(::leafnode)";
-        assertEquals("(And (Tag 'div')(Has (NodeEvaluator '::leafnode')))", sexpr(q));
+        assertEquals("(And (Tag 'div')(Has (InstanceType '::leafnode')))", sexpr(q));
         Elements els = doc.select(q);
         assertSelectedIds(els, "2");
     }
@@ -1574,7 +1574,7 @@ public class SelectorTest {
     @Test void leafNodeContains() {
         Document doc = Jsoup.parse("<div id=1>foo</div><div id=2><!-- bar --></div><div id=3>Bar</div><div id=4><script id=5> Bar </script></div>");
         String q = "div:has(::leafnode:contains(Bar))";
-        assertEquals("(And (Tag 'div')(Has (And (NodeEvaluator '::leafnode')(ContainsValue ':contains(bar)'))))", sexpr(q));
+        assertEquals("(And (Tag 'div')(Has (And (InstanceType '::leafnode')(ContainsValue ':contains(bar)'))))", sexpr(q));
         Elements els = doc.select(q);
         assertSelectedIds(els, "2", "3", "4");
     }
@@ -1594,7 +1594,7 @@ public class SelectorTest {
     @Test void selectComment() {
         Document doc = Jsoup.parse("<div><!-- find this --></div><!-- and this --><p><!-- not that --></p>");
         String q = "::comment:contains(this)";
-        assertEquals("(And (NodeEvaluator '::comment')(ContainsValue ':contains(this)'))", sexpr(q));
+        assertEquals("(And (InstanceType '::comment')(ContainsValue ':contains(this)'))", sexpr(q));
         Nodes<Comment> comments = doc.selectNodes(q, Comment.class);
 
         assertEquals(2, comments.size());
@@ -1650,7 +1650,7 @@ public class SelectorTest {
 
         String notBlank = "::comment:not(:blank)";
         Evaluator notBlankEval = QueryParser.parse(notBlank);
-        assertEquals("(And (NodeEvaluator '::comment')(Not (BlankValue ':blank')))", sexpr(notBlankEval));
+        assertEquals("(And (InstanceType '::comment')(Not (BlankValue ':blank')))", sexpr(notBlankEval));
         Nodes<Comment> commentsWithData = doc.selectNodes(notBlankEval, Comment.class);
         assertEquals(1, commentsWithData.size());
         assertEquals(" two ", commentsWithData.get(0).getData());
@@ -1678,7 +1678,7 @@ public class SelectorTest {
 
         String regex = "::leafnode:matches(\\d{3,4})";
         Evaluator eval = Selector.evaluatorOf(regex);
-        assertEquals("(And (NodeEvaluator '::leafnode')(MatchesValue ':matches(\\d{3,4})'))", sexpr(eval));
+        assertEquals("(And (InstanceType '::leafnode')(MatchesValue ':matches(\\d{3,4})'))", sexpr(eval));
 
         Nodes<Node> nodes = doc.selectNodes(eval);
         assertEquals(4, nodes.size());
