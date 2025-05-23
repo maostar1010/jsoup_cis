@@ -3209,9 +3209,10 @@ public class ElementTest {
         boolean threw = false;
         try {
             doc.expectFirstNode("::comment", Comment.class);
-            threw = true;
         } catch (IllegalArgumentException e) {
+            threw = true;
             assertEquals("No nodes matched the query '::comment' in the document.", e.getMessage());
         }
+        assertTrue(threw);
     }
 }
