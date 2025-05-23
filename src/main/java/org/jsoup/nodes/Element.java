@@ -1585,9 +1585,12 @@ public class Element extends Node implements Iterable<Element> {
         return wholeTextOf(nodeStream());
     }
 
+    /**
+     An Element's nodeValue is its whole own text.
+     */
     @Override
     public String nodeValue() {
-        return wholeText();
+        return wholeOwnText();
     }
 
     private static String wholeTextOf(Stream<Node> stream) {

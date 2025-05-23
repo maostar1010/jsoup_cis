@@ -1624,4 +1624,53 @@ public class SelectorTest {
         assertEquals("One", ps.get(0).text());
         assertEquals("Two", ps.get(1).text());
     }
+
+    @Test void blankNodes() {
+        Document doc = Jsoup.parse("<p> </p><p><!--  --><!----></p><p>\n</p><p>One</p><p><!-- two --></p>");
+
+        Nodes<Node> nodes = doc.selectNodes("::node:blank", Node.class);
+        assertEquals(12, nodes.size());
+        assertEquals("#document", nodes.get(0).nodeName());
+        assertEquals("html", nodes.get(1).nodeName());
+        assertEquals("head", nodes.get(2).nodeName());
+        assertEquals("body", nodes.get(3).nodeName());
+        assertEquals("p", nodes.get(4).nodeName());
+        assertEquals("#text", nodes.get(5).nodeName());
+        assertEquals("p", nodes.get(6).nodeName());
+        assertEquals("#comment", nodes.get(7).nodeName());
+        assertEquals("#comment", nodes.get(8).nodeName());
+        assertEquals("p", nodes.get(9).nodeName());
+        assertEquals("#text", nodes.get(10).nodeName());
+        assertEquals("p", nodes.get(11).nodeName());
+
+        Nodes<Comment> comments = doc.selectNodes("::comment:blank", Comment.class);
+        assertEquals(2, comments.size());
+        assertEquals("  ", comments.get(0).getData());
+        assertEquals("", comments.get(1).getData());
+
+        String notBlank = "::comment:not(:blank)";
+        Evaluator notBlankEval = QueryParser.parse(notBlank);
+        assertEquals("(And (NodeEvaluator '::comment')(Not (BlankValue ':blank')))", sexpr(notBlankEval));
+        Nodes<Comment> commentsWithData = doc.selectNodes(notBlankEval, Comment.class);
+        assertEquals(1, commentsWithData.size());
+        assertEquals(" two ", commentsWithData.get(0).getData());
+    }
+
+    @Test void blankElements() {
+        Document doc = Jsoup.parse("<p id=1>  </p><p id=2>One</p><p id=3><span>One</span></p>");
+        Elements els = doc.select("p:blank");
+        assertSelectedIds(els, "1", "3");
+    }
+
+    @Test void nonBlankText() {
+        Document doc = Jsoup.parse("<p id=1>  </p><p id=2>One</p><p id=3><span id=4>Two</span></p>");
+        Elements els = doc.select(":not(:blank)");
+        assertSelectedIds(els, "2", "4");
+
+        Nodes<TextNode> text = doc.selectNodes("::text:not(:blank)", TextNode.class);
+        assertEquals(2, text.size());
+        assertEquals("One", text.get(0).getWholeText());
+        assertEquals("Two", text.get(1).getWholeText());
+    }
+
 }

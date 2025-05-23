@@ -1,5 +1,7 @@
 package org.jsoup.select;
 
+import org.jsoup.internal.StringUtil;
+import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.LeafNode;
 import org.jsoup.nodes.Node;
@@ -83,4 +85,37 @@ class NodeEvaluator extends Evaluator {
         }
     }
 
+    /**
+     Matches nodes with no value or only whitespace.
+     */
+    static class BlankValue extends Evaluator {
+        @Override
+        public boolean matches(Element root, Element element) {
+            return evaluateMatch(element);
+        }
+
+        @Override
+        boolean matches(Element root, LeafNode leafNode) {
+            return evaluateMatch(leafNode);
+        }
+
+        static boolean evaluateMatch(Node node) {
+            return StringUtil.isBlank(node.nodeValue());
+        }
+
+        @Override
+        protected int cost() {
+            return 4;
+        }
+
+        @Override
+        public String toString() {
+            return ":blank";
+        }
+
+        @Override
+        boolean wantsNodes() {
+            return true;
+        }
+    }
 }

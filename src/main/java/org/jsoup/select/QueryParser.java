@@ -248,6 +248,8 @@ public class QueryParser implements AutoCloseable {
                 return new Evaluator.IsOnlyOfType();
             case "empty":
                 return new Evaluator.IsEmpty();
+            case "blank":
+                return new NodeEvaluator.BlankValue();
             case "root":
                 return new Evaluator.IsRoot();
             case "matchText":
