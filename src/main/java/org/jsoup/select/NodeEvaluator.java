@@ -11,6 +11,17 @@ import static org.jsoup.internal.Normalizer.lowerCase;
 import static org.jsoup.internal.StringUtil.normaliseWhitespace;
 
 abstract class NodeEvaluator extends Evaluator {
+
+    @Override
+    public boolean matches(Element root, Element element) {
+        return evaluateMatch(element);
+    }
+
+    @Override boolean matches(Element root, LeafNode leaf) {
+        return evaluateMatch(leaf);
+    }
+
+    abstract boolean evaluateMatch(Node node);
     
     @Override boolean wantsNodes() {
         return true;
@@ -27,21 +38,13 @@ abstract class NodeEvaluator extends Evaluator {
         }
 
         @Override
-        protected int cost() {
-            return 1;
+        boolean evaluateMatch(Node node) {
+            return type.isInstance(node);
         }
 
         @Override
-        public boolean matches(Element root, Element element) {
-            return evaluateMatch(element);
-        }
-
-        @Override boolean matches(Element root, LeafNode leaf) {
-            return evaluateMatch(leaf);
-        }
-
-        boolean evaluateMatch(Node node) {
-            return type.isInstance(node);
+        protected int cost() {
+            return 1;
         }
 
         @Override
@@ -58,15 +61,6 @@ abstract class NodeEvaluator extends Evaluator {
         }
 
         @Override
-        public boolean matches(Element root, Element element) {
-            return evaluateMatch(element);
-        }
-
-        @Override
-        boolean matches(Element root, LeafNode leafNode) {
-            return evaluateMatch(leafNode);
-        }
-
         boolean evaluateMatch(Node node) {
             return lowerCase(node.nodeValue()).contains(searchText);
         }
@@ -86,17 +80,9 @@ abstract class NodeEvaluator extends Evaluator {
      Matches nodes with no value or only whitespace.
      */
     static class BlankValue extends NodeEvaluator {
-        @Override
-        public boolean matches(Element root, Element element) {
-            return evaluateMatch(element);
-        }
 
         @Override
-        boolean matches(Element root, LeafNode leafNode) {
-            return evaluateMatch(leafNode);
-        }
-
-        static boolean evaluateMatch(Node node) {
+        boolean evaluateMatch(Node node) {
             return StringUtil.isBlank(node.nodeValue());
         }
 
@@ -119,15 +105,6 @@ abstract class NodeEvaluator extends Evaluator {
         }
 
         @Override
-        public boolean matches(Element root, Element element) {
-            return evaluateMatch(element);
-        }
-
-        @Override
-        boolean matches(Element root, LeafNode leafNode) {
-            return evaluateMatch(leafNode);
-        }
-
         boolean evaluateMatch(Node node) {
             return pattern.matcher(node.nodeValue()).find();
         }

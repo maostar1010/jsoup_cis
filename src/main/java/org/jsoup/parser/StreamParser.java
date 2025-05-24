@@ -368,7 +368,7 @@ public class StreamParser implements Closeable {
         // NodeVisitor Interface:
         @Override public void head(Node node, int depth) {
             if (node instanceof Element) {
-                Element prev = ((Element) node).previousElementSibling();
+                Element prev = node.previousElementSibling();
                 // We prefer to wait until an element has a next sibling before emitting it; otherwise, get it in tail
                 if (prev != null) emitQueue.add(prev);
             }
